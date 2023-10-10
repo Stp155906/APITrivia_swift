@@ -2,7 +2,7 @@
 //  TriviaQuestion.swift
 //  Trivia
 //
-//  Created by Mari Batilando on 4/6/23.
+//  Created by Shantalia Perez
 //
 
 import Foundation
