@@ -2,7 +2,7 @@
 //  TriviaQuestionService.swift
 //  Trivia
 //
-//  Created by Chizaram Chibueze on 10/9/23.
+//  Created by Shantalia
 //
 
 import Foundation
