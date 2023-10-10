@@ -8,26 +8,44 @@
 import UIKit
 
 class TriviaViewController: UIViewController {
-  
-  @IBOutlet weak var currentQuestionNumberLabel: UILabel!
-  @IBOutlet weak var questionContainerView: UIView!
-  @IBOutlet weak var questionLabel: UILabel!
-  @IBOutlet weak var categoryLabel: UILabel!
-  @IBOutlet weak var answerButton0: UIButton!
-  @IBOutlet weak var answerButton1: UIButton!
-  @IBOutlet weak var answerButton2: UIButton!
-  @IBOutlet weak var answerButton3: UIButton!
-  
-  private var questions = [TriviaQuestion]()
-  private var currQuestionIndex = 0
-  private var numCorrectQuestions = 0
-  
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    addGradient()
-    questionContainerView.layer.cornerRadius = 8.0
-    // TODO: FETCH TRIVIA QUESTIONS HERE
-  }
+    
+    @IBOutlet weak var currentQuestionNumberLabel: UILabel!
+    @IBOutlet weak var questionContainerView: UIView!
+    @IBOutlet weak var questionLabel: UILabel!
+    @IBOutlet weak var categoryLabel: UILabel!
+    @IBOutlet weak var answerButton0: UIButton!
+    @IBOutlet weak var answerButton1: UIButton!
+    @IBOutlet weak var answerButton2: UIButton!
+    @IBOutlet weak var answerButton3: UIButton!
+    
+    private var questions = [TriviaQuestion]()
+    private var currQuestionIndex = 0
+    private var numCorrectQuestions = 0
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.view.isHidden = true
+        fetchTriviaQuestions()
+        addGradient()
+        questionContainerView.layer.cornerRadius = 8.0
+        // TODO: FETCH TRIVIA QUESTIONS HERE
+      }
+        
+        private func fetchTriviaQuestions() {
+            TriviaQuestionService().fetchTriviaQuestions { [weak self] (result) in
+                DispatchQueue.main.async {
+                    switch result {
+                    case.success(let questions):
+                        self?.questions = questions
+                        self?.updateQuestion(withQuestionIndex: 0)
+                        self?.view.isHidden = false
+                    case.failure(let error):
+                        print("Error fetching questions: \(error)")
+                    }
+                }
+            }
+        }
+    
+    
   
   private func updateQuestion(withQuestionIndex questionIndex: Int) {
     currentQuestionNumberLabel.text = "Question: \(questionIndex + 1)/\(questions.count)"
@@ -52,6 +70,7 @@ class TriviaViewController: UIViewController {
     }
   }
   
+
   private func updateToNextQuestion(answer: String) {
     if isCorrectAnswer(answer) {
       numCorrectQuestions += 1
@@ -64,9 +83,14 @@ class TriviaViewController: UIViewController {
     updateQuestion(withQuestionIndex: currQuestionIndex)
   }
   
-  private func isCorrectAnswer(_ answer: String) -> Bool {
-    return answer == questions[currQuestionIndex].correctAnswer
-  }
+    private func isCorrectAnswer(_ answer: String) -> Bool {
+        guard currQuestionIndex < questions.count else {
+            print("Error: Current question index out of range")
+            return false
+        }
+        return answer == questions[currQuestionIndex].correctAnswer
+    }
+
   
   private func showFinalScore() {
     let alertController = UIAlertController(title: "Game over!",
